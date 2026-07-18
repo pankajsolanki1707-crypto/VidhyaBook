@@ -330,21 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1500);
   }
 
-  // --- THEME TOGGLE (LIGHT/DARK) ---
-  const themeToggle = document.getElementById('theme-toggle');
-  if (themeToggle) {
-    // Check localStorage preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.body.classList.add('dark-theme');
-    }
-    
-    themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-theme');
-      const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
-      localStorage.setItem('theme', theme);
-    });
-  }
+
 
   // --- BACK TO TOP BUTTON ---
   const backToTop = document.getElementById('back-to-top');

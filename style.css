@@ -2604,110 +2604,7 @@ textarea:focus-visible {
   transform: scale(1.05);
 }
 
-/* --- THEME TOGGLE & DARK THEME --- */
-.theme-toggle-btn {
-  background: none;
-  border: none;
-  color: var(--primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  padding: 0;
-  margin-right: 12px;
-}
 
-.theme-toggle-btn:hover {
-  background-color: rgba(33, 61, 143, 0.08);
-  color: var(--primary-dark);
-}
-
-.theme-toggle-btn svg {
-  width: 18px;
-  height: 18px;
-  transition: transform 0.5s ease;
-}
-
-.theme-toggle-btn .sun-icon {
-  display: none;
-}
-
-/* Dark Mode Variables */
-body.dark-theme {
-  --bg-white: #0f172a;
-  --bg-light: #1e293b;
-  --text-dark: #f8fafc;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
-}
-
-body.dark-theme .theme-toggle-btn {
-  color: var(--accent);
-}
-
-body.dark-theme .theme-toggle-btn:hover {
-  background-color: rgba(252, 209, 22, 0.15);
-}
-
-body.dark-theme .theme-toggle-btn .moon-icon {
-  display: none;
-}
-
-body.dark-theme .theme-toggle-btn .sun-icon {
-  display: block;
-  transform: rotate(360deg);
-}
-
-body.dark-theme .header-container {
-  background-color: rgba(15, 23, 42, 0.9);
-  border-bottom-color: #334155;
-}
-
-body.dark-theme .why-card,
-body.dark-theme .service-card,
-body.dark-theme .offer-card,
-body.dark-theme .faq-item,
-body.dark-theme .google-rating-card,
-body.dark-theme .testimonial-card {
-  background-color: #1e293b;
-  border-color: #334155;
-}
-
-body.dark-theme .why-card h3,
-body.dark-theme .service-card h3,
-body.dark-theme .testimonial-author-info h4 {
-  color: #f8fafc;
-}
-
-body.dark-theme .faq-header {
-  border-bottom-color: #334155;
-  color: #f8fafc;
-}
-
-body.dark-theme .faq-header:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-}
-
-body.dark-theme .faq-content {
-  background-color: rgba(255, 255, 255, 0.02);
-}
-
-body.dark-theme .trust-strip {
-  background-color: #0b0f19;
-  border-bottom-color: #1e293b;
-}
-
-body.dark-theme .brand-item {
-  color: #475569;
-}
-
-body.dark-theme .brand-item:hover {
-  color: var(--accent);
-}
 
 /* --- ADD DIRECTIONS FAB --- */
 .fab-directions {
@@ -2761,9 +2658,7 @@ body.dark-theme .brand-item:hover {
   pointer-events: none;
 }
 
-body.dark-theme .quote-icon {
-  color: rgba(255, 255, 255, 0.03);
-}
+
 
 @media (max-width: 480px) {
   .back-to-top-btn {
