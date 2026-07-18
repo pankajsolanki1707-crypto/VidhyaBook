@@ -304,4 +304,97 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // --- SCROLL PROGRESS INDICATOR ---
+  const scrollProgress = document.getElementById('scroll-progress');
+  if (scrollProgress) {
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      scrollProgress.style.width = scrolled + '%';
+    }, { passive: true });
+  }
+
+  // --- LOADER OVERLAY FADE-OUT ---
+  const loader = document.getElementById('loader');
+  if (loader) {
+    // Fade out loader overlay after page load
+    window.addEventListener('load', () => {
+      loader.classList.add('fade-out');
+    });
+    // Fallback if onload doesn't fire immediately (e.g. cached page)
+    setTimeout(() => {
+      if (!loader.classList.contains('fade-out')) {
+        loader.classList.add('fade-out');
+      }
+    }, 1500);
+  }
+
+  // --- THEME TOGGLE (LIGHT/DARK) ---
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    // Check localStorage preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-theme');
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-theme');
+      const theme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+      localStorage.setItem('theme', theme);
+    });
+  }
+
+  // --- BACK TO TOP BUTTON ---
+  const backToTop = document.getElementById('back-to-top');
+  if (backToTop) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTop.classList.add('active');
+      } else {
+        backToTop.classList.remove('active');
+      }
+    }, { passive: true });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+
+  // --- SWIPE SUPPORT FOR TESTIMONIALS ---
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  if (track && slideCount > 0) {
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+  }
+
+  function handleSwipe() {
+    const swipeThreshold = 50;
+    if (touchStartX - touchEndX > swipeThreshold) {
+      // Swipe left -> next slide
+      clearInterval(autoplayTimer);
+      let nextSlide = (currentSlide + 1) % slideCount;
+      selectSlide(nextSlide);
+      startAutoplay();
+    } else if (touchEndX - touchStartX > swipeThreshold) {
+      // Swipe right -> prev slide
+      clearInterval(autoplayTimer);
+      let prevSlide = (currentSlide - 1 + slideCount) % slideCount;
+      selectSlide(prevSlide);
+      startAutoplay();
+    }
+  }
+
 });
