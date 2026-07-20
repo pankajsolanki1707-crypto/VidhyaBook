@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll(); // Initial check
 
+  // --- AIRBNB HEART SAVE STATE TOGGLE ---
+  window.toggleSaveHeart = function(e, btn) {
+    if (e) e.stopPropagation();
+    btn.classList.toggle('saved');
+  };
+
 
   // --- MOBILE NAV HAMBURGER MENU ---
   const hamburger = document.getElementById('hamburger');
