@@ -718,23 +718,408 @@ function closeCartPanel() {
   document.body.style.overflow = '';
 }
 
-// ─── BUY NOW ──────────────────────────────────────────────
-window.buyNow = function(bookId) {
+// ─── WHATSAPP BUY NOW ORDER SYSTEM ────────────────────────
+const STORE_WHATSAPP = '918982883332'; // Configurable WhatsApp store owner number
+
+let waCurrentBookId = 1;
+let waCurrentQty = 1;
+let waCurrentDelivery = 'home';
+let waLastMessageText = '';
+let waLastUrl = '';
+
+window.openWaOrderModal = function(bookId) {
   const book = BOOKS_DB[bookId];
   if (!book) return;
 
-  // Add to cart if not already
-  const existingIndex = cart.findIndex(i => i.id === bookId);
-  if (existingIndex === -1) {
-    cart.push({ id: bookId, qty: 1, price: book.price });
-    saveCart();
-    updateCartCount();
-  }
+  waCurrentBookId = bookId;
+  waCurrentQty = 1;
+  waCurrentDelivery = 'home';
 
-  // Close any open modals and open checkout
+  // Close any open modals
   closeBookModal();
   closeCartPanel();
-  openCheckout();
+
+  // Populate product details in modal
+  const catEl = document.getElementById('wa-product-cat');
+  const titleEl = document.getElementById('wa-modal-title');
+  const authorEl = document.getElementById('wa-product-author');
+  const imgBox = document.getElementById('wa-product-img-box');
+  const pricingRow = document.getElementById('wa-pricing-row');
+
+  if (catEl) catEl.textContent = book.category || 'Bestseller';
+  if (titleEl) titleEl.textContent = book.title || 'Book Title';
+  if (authorEl) authorEl.textContent = `By ${book.author || 'Author'}`;
+
+  if (imgBox) {
+    if (book.hasImage && book.imageSrc) {
+      imgBox.innerHTML = `<img src="${book.imageSrc}" alt="${book.imageAlt}">`;
+    } else {
+      imgBox.innerHTML = `<div class="book-placeholder-cover ${book.placeholderClass || 'book-placeholder-gold'}" style="border-radius:8px;width:100%;height:100%;"><div class="bpc-title" style="font-size:0.5rem;">${book.title}</div></div>`;
+    }
+  }
+
+  if (pricingRow) {
+    const savings = book.mrp ? (book.mrp - book.price) : 0;
+    pricingRow.innerHTML = `
+      ${book.mrp ? `<span class="wa-price-mrp">MRP ₹${book.mrp}</span>` : ''}
+      <span class="wa-price-sale">₹${book.price}</span>
+      ${savings > 0 ? `<span class="wa-price-save">Save ₹${savings}</span>` : ''}
+    `;
+  }
+
+  // Reset Stepper & Order Summary
+  waUpdateQty(0);
+
+  // Reset Delivery selector
+  waSelectDelivery('home');
+
+  // Clear Form & Errors
+  waClearForm();
+
+  // Show modal
+  const overlay = document.getElementById('wa-modal-overlay');
+  if (overlay) {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeWaOrderModal = function() {
+  const overlay = document.getElementById('wa-modal-overlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+};
+
+window.waUpdateQty = function(delta) {
+  waCurrentQty = Math.min(10, Math.max(1, waCurrentQty + delta));
+
+  const countEl = document.getElementById('wa-qty-count');
+  const summaryPrice = document.getElementById('wa-summary-price');
+  const summaryQty = document.getElementById('wa-summary-qty');
+  const summaryTotal = document.getElementById('wa-summary-total');
+  const minusBtn = document.getElementById('wa-qty-minus');
+  const plusBtn = document.getElementById('wa-qty-plus');
+
+  const book = BOOKS_DB[waCurrentBookId];
+  const price = book ? book.price : 149;
+  const total = price * waCurrentQty;
+
+  if (countEl) countEl.textContent = waCurrentQty;
+  if (summaryPrice) summaryPrice.textContent = `₹${price}`;
+  if (summaryQty) summaryQty.textContent = waCurrentQty;
+  if (summaryTotal) summaryTotal.textContent = `₹${total.toLocaleString('en-IN')}`;
+
+  if (minusBtn) minusBtn.disabled = (waCurrentQty <= 1);
+  if (plusBtn) plusBtn.disabled = (waCurrentQty >= 10);
+};
+
+window.waSelectDelivery = function(type) {
+  waCurrentDelivery = type;
+  const cardHome = document.getElementById('wa-card-home');
+  const cardPickup = document.getElementById('wa-card-pickup');
+  const formHome = document.getElementById('wa-form-home');
+  const formPickup = document.getElementById('wa-form-pickup');
+  const radioHome = document.getElementById('wa-radio-home');
+  const radioPickup = document.getElementById('wa-radio-pickup');
+
+  if (type === 'home') {
+    if (cardHome) cardHome.classList.add('active');
+    if (cardPickup) cardPickup.classList.remove('active');
+    if (formHome) formHome.style.display = 'flex';
+    if (formPickup) formPickup.style.display = 'none';
+    if (radioHome) radioHome.checked = true;
+  } else {
+    if (cardHome) cardHome.classList.remove('active');
+    if (cardPickup) cardPickup.classList.add('active');
+    if (formHome) formHome.style.display = 'none';
+    if (formPickup) formPickup.style.display = 'flex';
+    if (radioPickup) radioPickup.checked = true;
+  }
+};
+
+function waClearForm() {
+  document.querySelectorAll('.wa-form-group').forEach(fg => fg.classList.remove('has-error'));
+  document.querySelectorAll('.wa-err-msg').forEach(em => { em.textContent = ''; em.classList.remove('active'); });
+
+  ['wa-hd-name', 'wa-hd-phone', 'wa-hd-house', 'wa-hd-landmark', 'wa-hd-notes', 'wa-sp-name', 'wa-sp-phone', 'wa-sp-msg'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const areaSelect = document.getElementById('wa-hd-area');
+  if (areaSelect) areaSelect.value = '';
+
+  const timeSelect = document.getElementById('wa-sp-time');
+  if (timeSelect) timeSelect.value = '';
+
+  const dateInput = document.getElementById('wa-sp-date');
+  if (dateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+    dateInput.value = today;
+  }
+}
+
+window.waSubmitOrder = function() {
+  document.querySelectorAll('.wa-form-group').forEach(fg => fg.classList.remove('has-error'));
+  document.querySelectorAll('.wa-err-msg').forEach(em => { em.textContent = ''; em.classList.remove('active'); });
+
+  let isValid = true;
+  const book = BOOKS_DB[waCurrentBookId] || { title: 'Book', price: 149 };
+
+  let name = '', phone = '', house = '', area = '', landmark = '', notes = '', pickupDate = '', pickupTime = '';
+
+  if (waCurrentDelivery === 'home') {
+    name = (document.getElementById('wa-hd-name')?.value || '').trim();
+    phone = (document.getElementById('wa-hd-phone')?.value || '').trim();
+    house = (document.getElementById('wa-hd-house')?.value || '').trim();
+    area = (document.getElementById('wa-hd-area')?.value || '').trim();
+    landmark = (document.getElementById('wa-hd-landmark')?.value || '').trim();
+    notes = (document.getElementById('wa-hd-notes')?.value || '').trim();
+
+    if (!name) {
+      showInlineErr('wa-hd-name', 'Full Name is required');
+      isValid = false;
+    }
+    if (!phone || !/^\d{10}$/.test(phone)) {
+      showInlineErr('wa-hd-phone', 'Enter a valid 10-digit mobile number');
+      isValid = false;
+    }
+    if (!house) {
+      showInlineErr('wa-hd-house', 'House/Flat number is required');
+      isValid = false;
+    }
+    if (!area) {
+      showInlineErr('wa-hd-area', 'Please select your delivery area');
+      isValid = false;
+    }
+  } else {
+    name = (document.getElementById('wa-sp-name')?.value || '').trim();
+    phone = (document.getElementById('wa-sp-phone')?.value || '').trim();
+    pickupDate = (document.getElementById('wa-sp-date')?.value || '').trim();
+    pickupTime = (document.getElementById('wa-sp-time')?.value || '').trim();
+    notes = (document.getElementById('wa-sp-msg')?.value || '').trim();
+
+    if (!name) {
+      showInlineErr('wa-sp-name', 'Full Name is required');
+      isValid = false;
+    }
+    if (!phone || !/^\d{10}$/.test(phone)) {
+      showInlineErr('wa-sp-phone', 'Enter a valid 10-digit phone number');
+      isValid = false;
+    }
+  }
+
+  if (!isValid) return;
+
+  // Show loading spinner
+  const submitBtn = document.getElementById('wa-submit-btn');
+  const sbDefault = document.getElementById('wa-sb-default');
+  const sbLoading = document.getElementById('wa-sb-loading');
+  if (submitBtn) submitBtn.disabled = true;
+  if (sbDefault) sbDefault.style.display = 'none';
+  if (sbLoading) sbLoading.style.display = 'flex';
+
+  const totalPrice = book.price * waCurrentQty;
+
+  if (waCurrentDelivery === 'home') {
+    waLastMessageText = 
+`📚 *NEW BOOK ORDER*
+━━━━━━━━━━━━━━
+🛍 *Book Details*
+
+📖 Book:
+${book.title}
+
+💰 Price:
+₹${book.price}
+
+📦 Quantity:
+${waCurrentQty}
+
+💵 Total:
+₹${totalPrice}
+━━━━━━━━━━━━━━
+👤 *Customer Details*
+
+Name:
+${name}
+
+Phone:
+${phone}
+━━━━━━━━━━━━━━
+🚚 *Delivery Method*
+Home Delivery
+
+📍 Address
+
+Flat No:
+${house}
+
+Area:
+${area}
+
+Landmark:
+${landmark || 'N/A'}
+
+Special Instructions:
+${notes || 'None'}
+━━━━━━━━━━━━━━
+💳 Payment
+Cash On Delivery
+━━━━━━━━━━━━━━
+Please confirm availability.
+Thank you.`;
+  } else {
+    waLastMessageText =
+`📚 *BOOK RESERVATION REQUEST*
+━━━━━━━━━━━━━━
+📖 Book:
+${book.title}
+
+💰 Price:
+₹${book.price}
+
+📦 Quantity:
+${waCurrentQty}
+━━━━━━━━━━━━━━
+👤 Customer
+
+Name:
+${name}
+
+Phone:
+${phone}
+━━━━━━━━━━━━━━
+🏪 Store Pickup
+
+Preferred Date:
+${pickupDate || 'Today'}
+
+Preferred Time:
+${pickupTime || 'Any time'}
+━━━━━━━━━━━━━━
+Please reserve this book.
+I will collect it from the store.
+Thank you.`;
+  }
+
+  waLastUrl = `https://wa.me/${STORE_WHATSAPP}?text=${encodeURIComponent(waLastMessageText)}`;
+
+  // Save order details for screenshot generator
+  const bookingId = generateBookingId();
+  currentOrderDetails = {
+    bookingId,
+    name,
+    phone,
+    deliveryType: waCurrentDelivery,
+    address: waCurrentDelivery === 'home' ? `${house}, ${area}${landmark ? ', Near ' + landmark : ''}` : 'Store Pickup',
+    pickupDate,
+    pickupTime,
+    books: [{ title: book.title, qty: waCurrentQty, price: book.price }],
+    subtotal: totalPrice,
+    deliveryCharge: 0,
+    grandTotal: totalPrice
+  };
+
+  saveOrder(currentOrderDetails);
+
+  setTimeout(() => {
+    // Open WhatsApp
+    window.open(waLastUrl, '_blank');
+
+    if (submitBtn) submitBtn.disabled = false;
+    if (sbDefault) sbDefault.style.display = 'flex';
+    if (sbLoading) sbLoading.style.display = 'none';
+
+    closeWaOrderModal();
+    openWaSuccessModal();
+  }, 600);
+};
+
+function showInlineErr(inputId, msg) {
+  const inputEl = document.getElementById(inputId);
+  const errEl = document.getElementById(`err-${inputId}`);
+  if (inputEl && inputEl.parentElement) {
+    inputEl.parentElement.classList.add('has-error');
+  }
+  if (errEl) {
+    errEl.textContent = msg;
+    errEl.classList.add('active');
+  }
+}
+
+function openWaSuccessModal() {
+  const overlay = document.getElementById('wa-success-modal-overlay');
+  const sbiValue = document.getElementById('sbi-value');
+  const detailsEl = document.getElementById('success-order-details');
+
+  if (sbiValue && currentOrderDetails.bookingId) {
+    sbiValue.textContent = currentOrderDetails.bookingId;
+  }
+
+  if (detailsEl) {
+    const delivLabel = currentOrderDetails.deliveryType === 'home' ? 'Home Delivery (Indore)' : 'Store Pickup';
+    const books = currentOrderDetails.books || [];
+    detailsEl.innerHTML = `
+      <div style="font-size:0.85rem; display:flex; flex-direction:column; gap:4px; padding:12px; background:#F8FAFC; border-radius:10px; border:1px solid #E2E8F0;">
+        <div><strong>Customer:</strong> ${currentOrderDetails.name} (${currentOrderDetails.phone})</div>
+        <div><strong>Method:</strong> ${delivLabel}</div>
+        <div><strong>Item:</strong> ${books.map(b => b.title + ' × ' + b.qty).join(', ')}</div>
+        <div><strong>Total:</strong> <span style="color:#059669; font-weight:800;">₹${currentOrderDetails.grandTotal} (COD)</span></div>
+      </div>
+    `;
+  }
+
+  if (overlay) {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+window.waCloseSuccessModal = function() {
+  const overlay = document.getElementById('wa-success-modal-overlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+};
+
+window.waCopyOrderMessage = function() {
+  const btn = document.getElementById('wa-sm-btn-copy');
+  if (!waLastMessageText) return;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(waLastMessageText).then(() => {
+      if (btn) {
+        btn.textContent = '✓ Copied Message!';
+        setTimeout(() => { btn.textContent = '📋 Copy Order Message'; }, 2000);
+      }
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = waLastMessageText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (btn) {
+      btn.textContent = '✓ Copied Message!';
+      setTimeout(() => { btn.textContent = '📋 Copy Order Message'; }, 2000);
+    }
+  }
+};
+
+window.waReopenWhatsApp = function() {
+  if (waLastUrl) {
+    window.open(waLastUrl, '_blank');
+  }
+};
+
+// ─── BUY NOW ──────────────────────────────────────────────
+window.buyNow = function(bookId) {
+  openWaOrderModal(bookId);
 };
 
 // ─── PRODUCT MODAL ────────────────────────────────────────
@@ -743,20 +1128,15 @@ window.openBookModal = function(bookId) {
   if (!book) return;
   currentModalBookId = bookId;
 
-  // Populate modal
   document.getElementById('modal-category').textContent = book.category;
   document.getElementById('modal-book-title').textContent = book.fullTitle;
   document.getElementById('modal-description').textContent = book.description;
 
-  // Features
   const featuresEl = document.getElementById('modal-features');
   if (featuresEl) {
-    featuresEl.innerHTML = book.features.map(f =>
-      `<div class="modal-feature-item">${f}</div>`
-    ).join('');
+    featuresEl.innerHTML = book.features.map(f => `<div class="modal-feature-item">${f}</div>`).join('');
   }
 
-  // Pricing
   const pricingEl = document.getElementById('modal-pricing');
   if (pricingEl) {
     if (book.mrp) {
@@ -773,7 +1153,6 @@ window.openBookModal = function(bookId) {
     }
   }
 
-  // Image
   const imgWrap = document.getElementById('modal-img-wrap');
   if (imgWrap) {
     if (book.hasImage) {
@@ -790,13 +1169,11 @@ window.openBookModal = function(bookId) {
     }
   }
 
-  // Modal actions
   const buyBtn = document.getElementById('modal-buy-btn');
   const cartBtn = document.getElementById('modal-cart-btn');
   if (buyBtn) buyBtn.onclick = () => buyNow(bookId);
   if (cartBtn) cartBtn.onclick = () => { addToCart(bookId); closeBookModal(); };
 
-  // Show modal
   const overlay = document.getElementById('book-modal-overlay');
   if (overlay) {
     overlay.classList.add('active');
@@ -812,233 +1189,6 @@ function closeBookModal() {
   }
 }
 
-// ─── CHECKOUT ─────────────────────────────────────────────
-function refreshCheckoutSummary() {
-  const summaryEl = document.getElementById('checkout-order-summary');
-  if (!summaryEl) return;
-
-  const subtotal = getCartTotal();
-  const isPickup = document.getElementById('delivery-pickup')?.checked;
-  const delivery = isPickup ? 0 : (subtotal >= 499 ? 0 : 40);
-  const grand = subtotal + delivery;
-
-  summaryEl.innerHTML = `
-    ${cart.map(item => {
-      const b = BOOKS_DB[item.id];
-      return `<div class="cos-row"><strong>${b ? b.title : 'Book'} × ${item.qty}</strong><span>₹${(item.price * item.qty).toLocaleString('en-IN')}</span></div>`;
-    }).join('')}
-    <div class="cos-row"><span>Delivery</span><span>${delivery === 0 ? (isPickup ? 'FREE 🏪' : 'FREE 🚚') : '₹' + delivery}</span></div>
-    <div class="cos-row cos-total-row"><span>Grand Total</span><span>₹${grand.toLocaleString('en-IN')}</span></div>
-  `;
-}
-
-function openCheckout() {
-  if (cart.length === 0) {
-    openCartPanel();
-    return;
-  }
-
-  // Reset to Home Delivery on each open
-  const homeRadio = document.getElementById('delivery-home');
-  if (homeRadio) homeRadio.checked = true;
-
-  refreshCheckoutSummary();
-
-  // Show checkout
-  const overlay = document.getElementById('checkout-overlay');
-  const stepSuccess = document.getElementById('step-success');
-  const stepChoice = document.getElementById('step-delivery-choice');
-  if (overlay) {
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-  if (stepSuccess) stepSuccess.style.display = 'none';
-  if (stepChoice) stepChoice.style.display = 'block';
-
-  // Set min date for pickup
-  const dateInput = document.getElementById('sp-date');
-  if (dateInput) {
-    const today = new Date().toISOString().split('T')[0];
-    dateInput.min = today;
-    dateInput.value = today;
-  }
-}
-
-function closeCheckout() {
-  const overlay = document.getElementById('checkout-overlay');
-  if (overlay) {
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-}
-
-// ─── GENERATE BOOKING ID ──────────────────────────────────
-function generateBookingId() {
-  const year = new Date().getFullYear();
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  return `VB${year}${rand}`;
-}
-
-// ─── SAVE ORDER ───────────────────────────────────────────
-function saveOrder(orderData) {
-  const orders = JSON.parse(localStorage.getItem('vbs_orders') || '[]');
-  orders.push(orderData);
-  localStorage.setItem('vbs_orders', JSON.stringify(orders));
-}
-
-// ─── SHOW SUCCESS ─────────────────────────────────────────
-function showOrderSuccess(orderData) {
-  const bookingId = generateBookingId();
-  orderData.bookingId = bookingId;
-  orderData.timestamp = new Date().toISOString();
-  orderData.status = 'Pending';
-
-  saveOrder(orderData);
-  currentOrderDetails = orderData;
-
-  // Hide form step, show success
-  const stepChoice = document.getElementById('step-delivery-choice');
-  const stepSuccess = document.getElementById('step-success');
-  if (stepChoice) stepChoice.style.display = 'none';
-  if (stepSuccess) stepSuccess.style.display = 'block';
-
-  // Populate success
-  const sbiEl = document.getElementById('sbi-value');
-  if (sbiEl) sbiEl.textContent = bookingId;
-
-  const detailsEl = document.getElementById('success-order-details');
-  if (detailsEl) {
-    const delivType = orderData.deliveryType === 'home' ? '🚛 Home Delivery' : '🏪 Store Pickup';
-    const booksText = (orderData.books || []).map(b => `${b.title} × ${b.qty}`).join(', ');
-    detailsEl.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <div style="display:flex;justify-content:space-between;"><span>Booking ID</span><strong>${bookingId}</strong></div>
-        <div style="display:flex;justify-content:space-between;"><span>Customer</span><strong>${orderData.name}</strong></div>
-        <div style="display:flex;justify-content:space-between;"><span>Phone</span><strong>${orderData.phone}</strong></div>
-        <div style="display:flex;justify-content:space-between;"><span>Delivery</span><strong>${delivType}</strong></div>
-        <div style="display:flex;justify-content:space-between;"><span>Books</span><strong>${booksText}</strong></div>
-        <div style="display:flex;justify-content:space-between;border-top:1px solid #E2E8F0;margin-top:6px;padding-top:6px;"><span>Total</span><strong style="color:#059669;">₹${orderData.grandTotal}</strong></div>
-      </div>
-    `;
-  }
-
-  // Clear cart after success
-  cart = [];
-  saveCart();
-  updateCartCount();
-  updateCartUI();
-}
-
-// ─── DELIVERY RADIO TOGGLE ────────────────────────────────
-function initDeliveryToggle() {
-  const homeRadio = document.getElementById('delivery-home');
-  const pickupRadio = document.getElementById('delivery-pickup');
-  const homeForm = document.getElementById('home-form');
-  const pickupForm = document.getElementById('pickup-form');
-  const optHome = document.getElementById('opt-home');
-  const optPickup = document.getElementById('opt-pickup');
-
-  function updateForms() {
-    if (homeRadio && homeRadio.checked) {
-      if (homeForm) homeForm.style.display = 'flex';
-      if (pickupForm) pickupForm.style.display = 'none';
-      if (optHome) optHome.classList.add('selected');
-      if (optPickup) optPickup.classList.remove('selected');
-    } else {
-      if (homeForm) homeForm.style.display = 'none';
-      if (pickupForm) pickupForm.style.display = 'flex';
-      if (optHome) optHome.classList.remove('selected');
-      if (optPickup) optPickup.classList.add('selected');
-    }
-    // Live-update order summary whenever delivery method changes
-    refreshCheckoutSummary();
-  }
-
-  if (homeRadio) homeRadio.addEventListener('change', updateForms);
-  if (pickupRadio) pickupRadio.addEventListener('change', updateForms);
-  updateForms();
-}
-
-// ─── FORM SUBMISSIONS ─────────────────────────────────────
-function initForms() {
-  const homeForm = document.getElementById('home-form');
-  const pickupForm = document.getElementById('pickup-form');
-
-  if (homeForm) {
-    homeForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('hd-name').value.trim();
-      const phone = document.getElementById('hd-phone').value.trim();
-      const house = document.getElementById('hd-house').value.trim();
-      const area = document.getElementById('hd-area').value.trim();
-      const landmark = document.getElementById('hd-landmark').value.trim();
-      const time = document.getElementById('hd-time').value;
-      const notes = document.getElementById('hd-notes').value.trim();
-
-      if (!name || !phone || !house || !area) {
-        alert('Please fill in all required fields (marked with *)');
-        return;
-      }
-      if (!/^\d{10}$/.test(phone)) {
-        alert('Please enter a valid 10-digit mobile number.');
-        return;
-      }
-
-      const subtotal = getCartTotal();
-      const delivery = subtotal >= 499 ? 0 : 40;
-
-      const orderData = {
-        deliveryType: 'home',
-        name, phone,
-        address: `${house}, ${area}${landmark ? ', Near ' + landmark : ''}`,
-        preferredTime: time || 'Any time',
-        notes,
-        books: cart.map(i => ({ ...i, title: BOOKS_DB[i.id]?.title || 'Book' })),
-        subtotal,
-        deliveryCharge: delivery,
-        grandTotal: subtotal + delivery
-      };
-
-      showOrderSuccess(orderData);
-    });
-  }
-
-  if (pickupForm) {
-    pickupForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('sp-name').value.trim();
-      const phone = document.getElementById('sp-phone').value.trim();
-      const date = document.getElementById('sp-date').value;
-      const time = document.getElementById('sp-time').value;
-      const msg = document.getElementById('sp-msg').value.trim();
-
-      if (!name || !phone || !date || !time) {
-        alert('Please fill in all required fields (marked with *)');
-        return;
-      }
-      if (!/^\d{10}$/.test(phone)) {
-        alert('Please enter a valid 10-digit mobile number.');
-        return;
-      }
-
-      const subtotal = getCartTotal();
-      const orderData = {
-        deliveryType: 'pickup',
-        name, phone,
-        pickupDate: date,
-        pickupTime: time,
-        notes: msg,
-        address: 'B-6, Payal Plaza, Bhanwarkua, Indore',
-        books: cart.map(i => ({ ...i, title: BOOKS_DB[i.id]?.title || 'Book' })),
-        subtotal,
-        deliveryCharge: 0,
-        grandTotal: subtotal
-      };
-
-      showOrderSuccess(orderData);
-    });
-  }
-}
 
 // ─── SUCCESS ACTIONS ──────────────────────────────────────
 function initSuccessActions() {
@@ -1253,14 +1403,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Checkout close
-  const checkoutClose = document.getElementById('checkout-close');
-  if (checkoutClose) checkoutClose.addEventListener('click', closeCheckout);
+  // WhatsApp Order Modal Close
+  const waModalClose = document.getElementById('wa-modal-close');
+  if (waModalClose) waModalClose.addEventListener('click', closeWaOrderModal);
 
-  const checkoutOverlay = document.getElementById('checkout-overlay');
-  if (checkoutOverlay) {
-    checkoutOverlay.addEventListener('click', (e) => {
-      if (e.target === checkoutOverlay) closeCheckout();
+  const waModalOverlay = document.getElementById('wa-modal-overlay');
+  if (waModalOverlay) {
+    waModalOverlay.addEventListener('click', (e) => {
+      if (e.target === waModalOverlay) closeWaOrderModal();
+    });
+  }
+
+  const waSuccessOverlay = document.getElementById('wa-success-modal-overlay');
+  if (waSuccessOverlay) {
+    waSuccessOverlay.addEventListener('click', (e) => {
+      if (e.target === waSuccessOverlay) waCloseSuccessModal();
     });
   }
 
@@ -1269,7 +1426,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       closeBookModal();
       closeCartPanel();
-      closeCheckout();
+      closeWaOrderModal();
+      waCloseSuccessModal();
     }
   });
 

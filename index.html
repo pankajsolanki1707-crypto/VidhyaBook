@@ -740,194 +740,240 @@
   <!-- =====================================================
        CHECKOUT MODAL
   ====================================================== -->
-  <div class="checkout-overlay" id="checkout-overlay" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
-    <div class="checkout-modal" id="checkout-modal">
-      <button class="checkout-close" id="checkout-close" aria-label="Close Checkout">
+  <!-- =====================================================
+       WHATSAPP BUY NOW ORDER MODAL & SYSTEM
+  ====================================================== -->
+  <div class="wa-modal-overlay" id="wa-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="wa-modal-title">
+    <div class="wa-modal" id="wa-modal">
+      <button class="wa-modal-close" id="wa-modal-close" aria-label="Close Modal">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
 
-      <!-- Step 1: Delivery Choice -->
-      <div class="checkout-step" id="step-delivery-choice">
-        <h2 id="checkout-title" class="checkout-title">Complete Your Order</h2>
-        <p class="checkout-subtitle">Vidhya Book Store — Bhanwarkua, Indore</p>
-        <div class="checkout-order-summary" id="checkout-order-summary"></div>
+      <!-- Modal Content Layout -->
+      <div class="wa-modal-body">
+        
+        <!-- Left / Top: Selected Product Card -->
+        <div class="wa-product-card">
+          <div class="wa-product-img-box" id="wa-product-img-box">
+            <!-- Dynamic Image or SVG Cover -->
+          </div>
+          <div class="wa-product-details">
+            <span class="wa-product-cat" id="wa-product-cat">Bestseller</span>
+            <h2 class="wa-product-title" id="wa-modal-title">Book Title</h2>
+            <p class="wa-product-author" id="wa-product-author">Author Name</p>
+            <div class="wa-pricing-row" id="wa-pricing-row">
+              <span class="wa-price-mrp" id="wa-price-mrp">MRP ₹0</span>
+              <span class="wa-price-sale" id="wa-price-sale">₹0</span>
+              <span class="wa-price-save" id="wa-price-save">Save ₹0</span>
+            </div>
+          </div>
+        </div>
 
-        <div class="delivery-choice-wrap">
-          <p class="delivery-choice-label">How would you like to receive your order?</p>
-          <div class="delivery-options">
-            <label class="delivery-option" id="opt-home" for="delivery-home">
-              <input type="radio" name="delivery_type" id="delivery-home" value="home" checked>
-              <div class="do-content">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                <div>
-                  <strong>Home Delivery</strong>
-                  <span>Bhanwarkua Area Only • COD</span>
-                </div>
+        <!-- Quantity Stepper -->
+        <div class="wa-qty-wrapper">
+          <label class="wa-field-label">Quantity</label>
+          <div class="wa-qty-stepper">
+            <button type="button" class="wa-qty-btn" id="wa-qty-minus" onclick="waUpdateQty(-1)">−</button>
+            <span class="wa-qty-count" id="wa-qty-count">1</span>
+            <button type="button" class="wa-qty-btn" id="wa-qty-plus" onclick="waUpdateQty(1)">+</button>
+          </div>
+        </div>
+
+        <!-- Order Summary Card -->
+        <div class="wa-summary-card">
+          <div class="wa-summary-row">
+            <span>Book Price</span>
+            <span id="wa-summary-price">₹0</span>
+          </div>
+          <div class="wa-summary-row">
+            <span>Quantity</span>
+            <span id="wa-summary-qty">1</span>
+          </div>
+          <div class="wa-summary-row wa-summary-total">
+            <span>Total</span>
+            <span id="wa-summary-total">₹0</span>
+          </div>
+        </div>
+
+        <!-- Delivery Method Selector -->
+        <div class="wa-delivery-select">
+          <label class="wa-field-label">Choose Delivery Method</label>
+          <div class="wa-delivery-grid">
+            <label class="wa-delivery-card active" id="wa-card-home" onclick="waSelectDelivery('home')">
+              <input type="radio" name="wa_deliv_type" id="wa-radio-home" value="home" checked>
+              <div class="wa-dc-icon">🚚</div>
+              <div class="wa-dc-text">
+                <strong>Home Delivery</strong>
+                <span>Indore City • COD</span>
               </div>
             </label>
-            <label class="delivery-option" id="opt-pickup" for="delivery-pickup">
-              <input type="radio" name="delivery_type" id="delivery-pickup" value="pickup">
-              <div class="do-content">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                <div>
-                  <strong>Store Pickup</strong>
-                  <span>Payal Plaza, Bhanwarkua • Free</span>
-                </div>
+            <label class="wa-delivery-card" id="wa-card-pickup" onclick="waSelectDelivery('pickup')">
+              <input type="radio" name="wa_deliv_type" id="wa-radio-pickup" value="pickup">
+              <div class="wa-dc-icon">🏪</div>
+              <div class="wa-dc-text">
+                <strong>Store Pickup</strong>
+                <span>Payal Plaza • Free</span>
               </div>
             </label>
           </div>
         </div>
 
-        <!-- Home Delivery Form -->
-        <form class="checkout-form" id="home-form">
-          <p class="form-section-label">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>
-            Delivery Details (Bhanwarkua Region, Indore Only)
-          </p>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="hd-name">Full Name *</label>
-              <input type="text" id="hd-name" placeholder="Your full name" required>
-            </div>
-            <div class="form-group">
-              <label for="hd-phone">Mobile Number *</label>
-              <input type="tel" id="hd-phone" placeholder="10-digit mobile number" required maxlength="10">
-            </div>
+        <!-- FORM: Home Delivery -->
+        <form id="wa-form-home" class="wa-form" onsubmit="waHandleSubmit(event)">
+          <div class="wa-form-group">
+            <label for="wa-hd-name">Full Name <span class="wa-req">*</span></label>
+            <input type="text" id="wa-hd-name" placeholder="Enter your full name">
+            <span class="wa-err-msg" id="err-wa-hd-name"></span>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="hd-house">House / Flat No. *</label>
-              <input type="text" id="hd-house" placeholder="e.g. Flat 302, Building A" required>
-            </div>
-            <div class="form-group">
-              <label for="hd-area">Area / Colony *</label>
-              <input type="text" id="hd-area" placeholder="e.g. Bhanwarkua, Navlakha" required>
-            </div>
+
+          <div class="wa-form-group">
+            <label for="wa-hd-phone">Mobile Number <span class="wa-req">*</span></label>
+            <input type="tel" id="wa-hd-phone" maxlength="10" placeholder="10-digit mobile number" inputmode="numeric">
+            <span class="wa-err-msg" id="err-wa-hd-phone"></span>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="hd-landmark">Landmark</label>
-              <input type="text" id="hd-landmark" placeholder="Near landmark">
+
+          <div class="wa-form-group">
+            <label for="wa-hd-house">House / Flat Number <span class="wa-req">*</span></label>
+            <input type="text" id="wa-hd-house" placeholder="e.g. Flat 102, Wing B">
+            <span class="wa-err-msg" id="err-wa-hd-house"></span>
+          </div>
+
+          <div class="wa-form-group">
+            <label for="wa-hd-area">Area <span class="wa-req">*</span></label>
+            <select id="wa-hd-area">
+              <option value="">Select your area</option>
+              <option value="Bhanwarkua">Bhanwarkua</option>
+              <option value="Navlakha">Navlakha</option>
+              <option value="Vijay Nagar">Vijay Nagar</option>
+              <option value="Palasia">Palasia</option>
+              <option value="Scheme 140">Scheme 140</option>
+              <option value="Sapna Sangeeta">Sapna Sangeeta</option>
+              <option value="Tower Square">Tower Square</option>
+              <option value="Rajendra Nagar">Rajendra Nagar</option>
+              <option value="Other (Indore)">Other (Indore)</option>
+            </select>
+            <span class="wa-err-msg" id="err-wa-hd-area"></span>
+          </div>
+
+          <div class="wa-form-group">
+            <label for="wa-hd-landmark">Landmark <span class="wa-opt">(Optional)</span></label>
+            <input type="text" id="wa-hd-landmark" placeholder="Near landmark or school">
+          </div>
+
+          <div class="wa-form-group">
+            <label for="wa-hd-notes">Special Instructions <span class="wa-opt">(Optional)</span></label>
+            <textarea id="wa-hd-notes" rows="2" placeholder="e.g. Call before delivery"></textarea>
+          </div>
+
+          <div class="wa-notice-box">
+            📍 Home Delivery Available Only Within Indore City.<br>
+            <strong>Cash On Delivery Only.</strong>
+          </div>
+        </form>
+
+        <!-- FORM: Store Pickup -->
+        <form id="wa-form-pickup" class="wa-form" style="display:none;" onsubmit="waHandleSubmit(event)">
+          <div class="wa-form-group">
+            <label for="wa-sp-name">Full Name <span class="wa-req">*</span></label>
+            <input type="text" id="wa-sp-name" placeholder="Enter your full name">
+            <span class="wa-err-msg" id="err-wa-sp-name"></span>
+          </div>
+
+          <div class="wa-form-group">
+            <label for="wa-sp-phone">Phone Number <span class="wa-req">*</span></label>
+            <input type="tel" id="wa-sp-phone" maxlength="10" placeholder="10-digit mobile number" inputmode="numeric">
+            <span class="wa-err-msg" id="err-wa-sp-phone"></span>
+          </div>
+
+          <div class="wa-form-row">
+            <div class="wa-form-group">
+              <label for="wa-sp-date">Preferred Pickup Date <span class="wa-opt">(Optional)</span></label>
+              <input type="date" id="wa-sp-date">
             </div>
-            <div class="form-group">
-              <label for="hd-time">Preferred Delivery Time</label>
-              <select id="hd-time">
+
+            <div class="wa-form-group">
+              <label for="wa-sp-time">Preferred Pickup Time <span class="wa-opt">(Optional)</span></label>
+              <select id="wa-sp-time">
                 <option value="">Any time</option>
-                <option value="9am-12pm">Morning (9am – 12pm)</option>
-                <option value="12pm-4pm">Afternoon (12pm – 4pm)</option>
-                <option value="4pm-8pm">Evening (4pm – 8pm)</option>
+                <option value="Morning (9:30 AM - 12 PM)">Morning (9:30 AM - 12 PM)</option>
+                <option value="Afternoon (12 PM - 4 PM)">Afternoon (12 PM - 4 PM)</option>
+                <option value="Evening (4 PM - 9:30 PM)">Evening (4 PM - 9:30 PM)</option>
               </select>
             </div>
           </div>
-          <div class="form-group full">
-            <label for="hd-notes">Special Notes</label>
-            <textarea id="hd-notes" rows="2" placeholder="Any additional instructions"></textarea>
+
+          <div class="wa-form-group">
+            <label for="wa-sp-msg">Message <span class="wa-opt">(Optional)</span></label>
+            <textarea id="wa-sp-msg" rows="2" placeholder="Any message for store staff"></textarea>
           </div>
-          <div class="payment-info-card">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            <div>
-              <strong>Payment: Cash on Delivery Only</strong>
-              <span>No UPI • No Card • No Online Payment. Pay cash when your books arrive.</span>
-            </div>
+
+          <div class="wa-notice-box wa-notice-pickup">
+            🏪 <strong>Vidhya Book Store</strong> — B-6, Payal Plaza, Bhanwarkua, Indore.<br>
+            <span>Your books will be reserved for 24 hours after confirmation.</span>
           </div>
-          <button type="submit" class="btn-place-order" id="home-submit-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Place Order (COD)
-          </button>
         </form>
 
-        <!-- Store Pickup Form -->
-        <form class="checkout-form" id="pickup-form" style="display:none;">
-          <p class="form-section-label">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-            Store Pickup Details
-          </p>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="sp-name">Full Name *</label>
-              <input type="text" id="sp-name" placeholder="Your full name" required>
-            </div>
-            <div class="form-group">
-              <label for="sp-phone">Phone Number *</label>
-              <input type="tel" id="sp-phone" placeholder="10-digit mobile number" required maxlength="10">
-            </div>
+        <!-- Payment Info Card -->
+        <div class="wa-payment-info-card">
+          <div class="wa-pic-header">
+            <span class="wa-pic-badge">💵 Cash on Delivery / Store Pickup</span>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="sp-date">Pickup Date *</label>
-              <input type="date" id="sp-date" required>
-            </div>
-            <div class="form-group">
-              <label for="sp-time">Pickup Time *</label>
-              <select id="sp-time" required>
-                <option value="">Select time slot</option>
-                <option value="9:30am-12pm">Morning (9:30am – 12pm)</option>
-                <option value="12pm-3pm">Afternoon (12pm – 3pm)</option>
-                <option value="3pm-6pm">Evening (3pm – 6pm)</option>
-                <option value="6pm-9:30pm">Night (6pm – 9:30pm)</option>
-              </select>
-            </div>
+          <div class="wa-pic-list">
+            <span>✗ No Online Payment</span>
+            <span>✗ No UPI</span>
+            <span>✗ No Credit Card</span>
           </div>
-          <div class="form-group full">
-            <label for="sp-msg">Message / Notes</label>
-            <textarea id="sp-msg" rows="2" placeholder="Any special requests or notes"></textarea>
-          </div>
-          <div class="pickup-address-card">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            <div>
-              <strong>Store Address</strong>
-              <span>B-6, Payal Plaza, Bhanwarkua (Below Kautilya Academy), Indore – 452001</span>
-              <span>Open: Mon–Sun, 9:30 AM – 9:30 PM</span>
-            </div>
-          </div>
-          <button type="submit" class="btn-place-order" id="pickup-submit-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Confirm Store Pickup
-          </button>
-        </form>
-
-      </div><!-- /step-delivery-choice -->
-
-      <!-- Step 2: Success Confirmation -->
-      <div class="checkout-step" id="step-success" style="display:none;">
-        <div class="success-animation">
-          <div class="success-checkmark">
-            <svg viewBox="0 0 52 52" width="72" height="72">
-              <circle class="success-circle" cx="26" cy="26" r="25" fill="none" stroke="#10B981" stroke-width="2"/>
-              <path class="success-check" fill="none" stroke="#10B981" stroke-width="3" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-            </svg>
-          </div>
-          <h2 class="success-title">Booking Successful! 🎉</h2>
-          <p class="success-subtitle">Please take a screenshot and show it at the store while collecting your books.</p>
-          <div class="success-booking-id" id="success-booking-id">
-            <span class="sbi-label">Booking ID</span>
-            <span class="sbi-value" id="sbi-value">VB2026XXXX</span>
-          </div>
-          <div class="success-order-details" id="success-order-details"></div>
-          <div class="success-actions">
-            <button class="btn-download-screenshot" id="btn-download-png">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download PNG
-            </button>
-            <button class="btn-download-screenshot" id="btn-download-jpeg">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download JPEG
-            </button>
-            <button class="btn-copy-booking" id="btn-copy-booking">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              Copy Booking ID
-            </button>
-            <button class="btn-whatsapp-confirm" id="btn-whatsapp-confirm">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" width="16" height="16"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7 .9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
-              WhatsApp Confirmation
-            </button>
-          </div>
-          <p class="success-note">📞 Our store will contact you within 15 minutes to confirm your order.</p>
         </div>
+
+        <!-- WhatsApp Submit Button -->
+        <button type="button" class="wa-submit-btn" id="wa-submit-btn" onclick="waSubmitOrder()">
+          <span class="wa-sb-default" id="wa-sb-default">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" width="22" height="22"><path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7 .9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
+            Place Order via WhatsApp
+          </span>
+          <span class="wa-sb-loading" id="wa-sb-loading" style="display:none;">
+            <svg class="wa-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            Preparing WhatsApp...
+          </span>
+        </button>
+
+      </div><!-- /wa-modal-body -->
+    </div><!-- /wa-modal -->
+  </div><!-- /wa-modal-overlay -->
+
+  <!-- WhatsApp Success Notification Overlay -->
+  <div class="wa-success-modal-overlay" id="wa-success-modal-overlay" style="display:none;">
+    <div class="wa-success-modal" id="step-success">
+      <button class="wa-modal-close" onclick="waCloseSuccessModal()">✕</button>
+      <div class="wa-sm-icon">✅</div>
+      <h3 class="wa-sm-title">WhatsApp Opened Successfully!</h3>
+      <p class="wa-sm-desc">Please press <strong>Send</strong> in WhatsApp to submit your order directly to the store.</p>
+      
+      <div class="success-booking-id" id="success-booking-id" style="margin: 16px 0;">
+        <span class="sbi-label">Booking Reference ID</span>
+        <span class="sbi-value" id="sbi-value">VB2026XXXX</span>
       </div>
 
-    </div><!-- /checkout-modal -->
-  </div><!-- /checkout-overlay -->
+      <div class="success-order-details" id="success-order-details" style="text-align:left; margin-bottom:16px;"></div>
+
+      <div class="wa-sm-actions">
+        <button type="button" class="btn-download-screenshot" id="btn-download-png">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button type="button" class="btn-download-screenshot" id="btn-download-jpeg">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download JPEG
+        </button>
+        <button type="button" class="wa-sm-btn-copy" id="wa-sm-btn-copy" onclick="waCopyOrderMessage()">
+          📋 Copy Order Message
+        </button>
+        <button type="button" class="wa-sm-btn-retry" onclick="waReopenWhatsApp()">
+          🔗 Re-open WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
 
 
   <!-- =====================================================
