@@ -384,57 +384,75 @@ ul {
   color: var(--muted);
 }
 
-.nav-menu {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
+@media (min-width: 992px) {
+  .hamburger {
+    display: none !important;
+  }
 
-.nav-link {
-  font-weight: 600;
-  font-size: 1rem; /* 16px typography.nav-link */
-  line-height: 1.25;
-  color: var(--ink);
-  position: relative;
-  padding: 10px 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
+  .nav-menu {
+    display: flex !important;
+    flex-direction: row !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    background: transparent !important;
+    padding: 0 !important;
+    gap: 28px !important;
+    box-shadow: none !important;
+    border: none !important;
+    animation: none !important;
+  }
 
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: var(--ink); /* Airbnb active tab underline rule is ink */
-  transition: width 0.2s ease;
-}
+  .nav-menu li {
+    display: inline-block !important;
+    width: auto !important;
+  }
 
-.nav-link:hover::after,
-.nav-link.active::after {
-  width: 100%;
-}
+  .nav-link {
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.25;
+    color: var(--ink) !important;
+    position: relative;
+    padding: 10px 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    width: auto !important;
+  }
 
-/* NEW tag badge on nav tabs */
-.new-tag {
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.32px;
-  text-transform: uppercase;
-  background-color: var(--primary);
-  color: #ffffff;
-  padding: 2px 6px;
-  border-radius: var(--radius-full);
-  line-height: 1.25;
-}
-  transition: var(--transition-fast);
-}
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--ink);
+    transition: width 0.2s ease;
+    display: block !important;
+  }
 
-.nav-link:hover::after {
-  width: 100%;
+  .nav-link:hover::after,
+  .nav-link.active::after {
+    width: 100% !important;
+  }
+
+  .new-tag {
+    font-size: 8px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.32px !important;
+    text-transform: uppercase !important;
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+    padding: 2px 6px !important;
+    border-radius: var(--radius-full) !important;
+    line-height: 1.25 !important;
+    margin-left: 4px !important;
+  }
 }
 
 .header-actions {

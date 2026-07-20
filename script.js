@@ -47,6 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   hamburger.addEventListener('click', toggleMobileMenu);
 
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 991) {
+      closeMobileMenu();
+    }
+  });
+
   // Universal smooth scroll & mobile drawer close for all anchor links
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a[href^="#"]');
