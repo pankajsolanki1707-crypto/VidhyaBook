@@ -277,8 +277,6 @@ ul {
   background-color: #20BA56;
   border-color: #20BA56;
   color: var(--text-white);
-}
-  color: var(--text-white);
   transform: translateY(-2px);
 }
 
@@ -357,6 +355,9 @@ ul {
 
 .logo-icon {
   width: 34px;
+  height: 34px;
+}
+
 .brand-logo-mark {
   flex-shrink: 0;
   display: block;
@@ -4376,14 +4377,8 @@ textarea:focus-visible {
 }
 
 /* ==========================================================
-   WHATSAPP BUY NOW ORDER MODAL — PREMIUM STYLES
+   WHATSAPP BUY NOW ORDER MODAL — PREMIUM STYLES & AIRBNB SCRIM
    ========================================================== */
-.wa-modal-overlay,
-.wa-success-modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-/* --- AIRBNB MODAL SCRIM & DIALOG --- */
 .wa-modal-overlay,
 .wa-success-modal-overlay {
   display: none;
