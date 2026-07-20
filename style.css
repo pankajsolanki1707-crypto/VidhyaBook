@@ -2319,19 +2319,20 @@ textarea:focus-visible {
     left: 0;
     width: 100%;
     height: calc(100vh - var(--header-height));
-    background-color: var(--bg-white);
-    padding: 40px 24px;
-    gap: 24px;
-    z-index: 999;
+    background-color: #ffffff;
+    padding: 20px 16px;
+    gap: 10px;
+    z-index: 10000;
     overflow-y: auto;
-    border-top: 1px solid var(--border-light);
-    animation: slideDownMenu 0.3s ease forwards;
+    border-top: 1px solid var(--hairline);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    animation: slideDownMenu 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   
   @keyframes slideDownMenu {
     from {
       opacity: 0;
-      transform: translateY(-10px);
+      transform: translateY(-8px);
     }
     to {
       opacity: 1;
@@ -2339,11 +2340,45 @@ textarea:focus-visible {
     }
   }
   
-  .nav-menu.mobile-active .nav-link {
-    font-size: 1.2rem;
+  .nav-menu.mobile-active li {
     width: 100%;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border-light);
+  }
+
+  .nav-menu.mobile-active .nav-link {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: var(--radius-sm); /* 8px rounded.sm */
+    background-color: var(--surface-soft);
+    border: 1px solid var(--hairline-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  
+  .nav-menu.mobile-active .nav-link:hover,
+  .nav-menu.mobile-active .nav-link.active {
+    background-color: var(--surface-strong);
+    color: var(--primary);
+  }
+  
+  .nav-menu.mobile-active .nav-link::after {
+    display: none;
+  }
+
+  .nav-menu.mobile-active .new-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.32px;
+    text-transform: uppercase;
+    background-color: var(--primary);
+    color: #ffffff;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
   }
   
   .header-actions {
