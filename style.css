@@ -2302,31 +2302,33 @@ textarea:focus-visible {
   }
   
   .nav-menu {
-    display: none; /* Hide default nav menu */
+    display: none !important;
   }
   
   /* Show Mobile Hamburger */
   .hamburger {
-    display: block;
+    display: block !important;
+    z-index: 100001 !important;
   }
   
   /* Mobile Navigation Drawer Overlay */
   .nav-menu.mobile-active {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: var(--header-height);
-    left: 0;
-    width: 100%;
-    height: calc(100vh - var(--header-height));
-    background-color: #ffffff;
-    padding: 20px 16px;
-    gap: 10px;
-    z-index: 10000;
-    overflow-y: auto;
-    border-top: 1px solid var(--hairline);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-    animation: slideDownMenu 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    display: flex !important;
+    flex-direction: column !important;
+    position: fixed !important;
+    top: var(--header-height, 70px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - var(--header-height, 70px)) !important;
+    background-color: #ffffff !important;
+    padding: 24px 20px 40px !important;
+    gap: 12px !important;
+    z-index: 99999 !important;
+    overflow-y: auto !important;
+    border-top: 1px solid var(--hairline) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    animation: slideDownMenu 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
   
   @keyframes slideDownMenu {
@@ -2341,44 +2343,56 @@ textarea:focus-visible {
   }
   
   .nav-menu.mobile-active li {
-    width: 100%;
+    width: 100% !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
   }
 
   .nav-menu.mobile-active .nav-link {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--ink);
-    width: 100%;
-    padding: 14px 18px;
-    border-radius: var(--radius-sm); /* 8px rounded.sm */
-    background-color: var(--surface-soft);
-    border: 1px solid var(--hairline-soft);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    text-decoration: none;
-    transition: background-color 0.2s ease;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    color: var(--ink) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 14px 20px !important;
+    border-radius: var(--radius-sm) !important; /* 8px rounded.sm */
+    background-color: var(--surface-soft) !important;
+    border: 1px solid var(--hairline) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
   }
   
   .nav-menu.mobile-active .nav-link:hover,
   .nav-menu.mobile-active .nav-link.active {
-    background-color: var(--surface-strong);
-    color: var(--primary);
+    background-color: var(--surface-strong) !important;
+    color: var(--primary) !important;
+    border-color: var(--primary-disabled) !important;
   }
   
   .nav-menu.mobile-active .nav-link::after {
-    display: none;
+    display: none !important;
   }
 
   .nav-menu.mobile-active .new-tag {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.32px;
-    text-transform: uppercase;
-    background-color: var(--primary);
-    color: #ffffff;
-    padding: 3px 8px;
-    border-radius: var(--radius-full);
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.32px !important;
+    text-transform: uppercase !important;
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+    padding: 4px 10px !important;
+    border-radius: var(--radius-full) !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    margin-left: 12px !important;
   }
   
   .header-actions {
