@@ -41,15 +41,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   hamburger.addEventListener('click', toggleMobileMenu);
 
-  navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      closeMobileMenu();
-    });
-  });
-
-  // Close menu if clicked outside
+  // Universal smooth scroll & mobile drawer close for all anchor links
   document.addEventListener('click', (e) => {
-    if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+    const link = e.target.closest('a[href^="#"]');
+    if (link) {
+      const targetId = link.getAttribute('href');
+      if (targetId && targetId !== '#') {
+        const targetSection = document.querySelector(targetId);
+        if (targetSection) {
+          e.preventDefault();
+          closeMobileMenu();
+          const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 70;
+          const targetPosition = targetSection.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }
+    } else if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
       closeMobileMenu();
     }
   });
