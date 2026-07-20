@@ -1508,5 +1508,93 @@ document.addEventListener('DOMContentLoaded', () => {
       cardObserver.observe(card);
     });
   }
+
+  // --- AIRBNB PILL SEARCH & LIVE FILTER ---
+  const searchInputBook = document.getElementById('search-input-book');
+  const searchInputCat = document.getElementById('search-input-cat');
+  const searchOrb = document.querySelector('.search-orb');
+
+  function filterBooks(scrollToBestsellers = false) {
+    const query = (searchInputBook ? searchInputBook.value : '').toLowerCase().trim();
+    const selectedCategory = (searchInputCat ? searchInputCat.value : '').toLowerCase().trim();
+    const cards = document.querySelectorAll('.book-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const title = (card.querySelector('.book-card-title')?.textContent || '').toLowerCase();
+      const category = (card.querySelector('.book-card-category')?.textContent || '').toLowerCase();
+      const desc = (card.querySelector('.book-card-desc')?.textContent || '').toLowerCase();
+      const metaName = (card.querySelector('meta[itemprop="name"]')?.content || '').toLowerCase();
+
+      const matchesQuery = !query || title.includes(query) || category.includes(query) || desc.includes(query) || metaName.includes(query);
+      const matchesCat = !selectedCategory || category.includes(selectedCategory);
+
+      if (matchesQuery && matchesCat) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Handle empty state message
+    let emptyState = document.getElementById('books-search-empty');
+    const booksGrid = document.getElementById('books-grid');
+
+    if (visibleCount === 0 && booksGrid) {
+      if (!emptyState) {
+        emptyState = document.createElement('div');
+        emptyState.id = 'books-search-empty';
+        emptyState.className = 'books-empty-state';
+        emptyState.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: var(--surface-soft); border-radius: var(--radius-md); border: 1px solid var(--hairline); width: 100%;';
+        booksGrid.appendChild(emptyState);
+      }
+      emptyState.innerHTML = `
+        <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 6px;">No books found matching "${query || selectedCategory}"</h3>
+        <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 20px;">Try searching another keyword or clear your filters to view all available titles.</p>
+        <button type="button" class="btn btn-primary" onclick="resetBookSearch()">Reset Search Filter</button>
+      `;
+      emptyState.style.display = 'block';
+    } else if (emptyState) {
+      emptyState.style.display = 'none';
+    }
+
+    if (scrollToBestsellers) {
+      const bestsellersSection = document.getElementById('bestsellers');
+      if (bestsellersSection) {
+        const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 70;
+        const targetPos = bestsellersSection.getBoundingClientRect().top + window.pageYOffset - headerHeight - 10;
+        window.scrollTo({ top: targetPos, behavior: 'smooth' });
+      }
+    }
+  }
+
+  window.resetBookSearch = function() {
+    if (searchInputBook) searchInputBook.value = '';
+    if (searchInputCat) searchInputCat.value = '';
+    filterBooks(false);
+  };
+
+  if (searchInputBook) {
+    searchInputBook.addEventListener('input', () => filterBooks(false));
+    searchInputBook.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        filterBooks(true);
+      }
+    });
+  }
+
+  if (searchInputCat) {
+    searchInputCat.addEventListener('change', () => filterBooks(true));
+  }
+
+  if (searchOrb) {
+    searchOrb.addEventListener('click', (e) => {
+      e.preventDefault();
+      filterBooks(true);
+    });
+  }
 });
 
