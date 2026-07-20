@@ -1405,7 +1405,6 @@ function initStickyBuyBar() {
 }
 
 // ─── EVENT LISTENERS ──────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize cart count on page load
   updateCartCount();
@@ -1443,19 +1442,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // WhatsApp Order Modal Close
   const waModalClose = document.getElementById('wa-modal-close');
-  if (waModalClose) waModalClose.addEventListener('click', closeWaOrderModal);
+  if (waModalClose) waModalClose.addEventListener('click', window.closeWaOrderModal);
 
   const waModalOverlay = document.getElementById('wa-modal-overlay');
   if (waModalOverlay) {
     waModalOverlay.addEventListener('click', (e) => {
-      if (e.target === waModalOverlay) closeWaOrderModal();
+      if (e.target === waModalOverlay) window.closeWaOrderModal();
     });
   }
 
   const waSuccessOverlay = document.getElementById('wa-success-modal-overlay');
   if (waSuccessOverlay) {
     waSuccessOverlay.addEventListener('click', (e) => {
-      if (e.target === waSuccessOverlay) waCloseSuccessModal();
+      if (e.target === waSuccessOverlay) window.waCloseSuccessModal();
     });
   }
 
@@ -1464,16 +1463,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') {
       closeBookModal();
       closeCartPanel();
-      closeWaOrderModal();
-      waCloseSuccessModal();
+      window.closeWaOrderModal();
+      window.waCloseSuccessModal();
     }
   });
 
-  // Initialize delivery toggle
-  initDeliveryToggle();
 
-  // Initialize forms
-  initForms();
 
   // Initialize success actions
   initSuccessActions();
@@ -1612,5 +1607,4 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inputCat) inputCat.value = '';
     window.triggerSearch(false);
   };
-});
 
