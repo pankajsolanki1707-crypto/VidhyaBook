@@ -1510,13 +1510,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- AIRBNB PILL SEARCH & LIVE FILTER ---
-  const searchInputBook = document.getElementById('search-input-book');
-  const searchInputCat = document.getElementById('search-input-cat');
-  const searchOrb = document.querySelector('.search-orb');
+  window.triggerSearch = function(scrollToBestsellers = false) {
+    const inputBook = document.getElementById('search-input-book');
+    const inputCat = document.getElementById('search-input-cat');
 
-  function filterBooks(scrollToBestsellers = false) {
-    let rawQuery = (searchInputBook ? searchInputBook.value : '').toLowerCase().trim();
-    let selectedCat = (searchInputCat ? searchInputCat.value : '').toLowerCase().trim();
+    let rawQuery = (inputBook ? inputBook.value : '').toLowerCase().trim();
+    let selectedCat = (inputCat ? inputCat.value : '').toLowerCase().trim();
     
     // Normalize generic bookstore terms ("books", "book", "store", "bestsellers", "read", "all") -> match all
     const genericTerms = ['books', 'book', 'bestseller', 'bestsellers', 'store', 'shop', 'read', 'all', 'vidhya'];
@@ -1604,33 +1603,14 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: targetPos, behavior: 'smooth' });
       }
     }
-  }
-
-  window.resetBookSearch = function() {
-    if (searchInputBook) searchInputBook.value = '';
-    if (searchInputCat) searchInputCat.value = '';
-    filterBooks(false);
   };
 
-  if (searchInputBook) {
-    searchInputBook.addEventListener('input', () => filterBooks(false));
-    searchInputBook.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        filterBooks(true);
-      }
-    });
-  }
-
-  if (searchInputCat) {
-    searchInputCat.addEventListener('change', () => filterBooks(true));
-  }
-
-  if (searchOrb) {
-    searchOrb.addEventListener('click', (e) => {
-      e.preventDefault();
-      filterBooks(true);
-    });
-  }
+  window.resetBookSearch = function() {
+    const inputBook = document.getElementById('search-input-book');
+    const inputCat = document.getElementById('search-input-cat');
+    if (inputBook) inputBook.value = '';
+    if (inputCat) inputCat.value = '';
+    window.triggerSearch(false);
+  };
 });
 

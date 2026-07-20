@@ -175,12 +175,12 @@
           <div class="search-bar-pill">
             <div class="search-segment">
               <span class="search-segment-label">Where</span>
-              <input type="text" class="search-segment-input" id="search-input-book" placeholder="Search books, authors, SSC, MPPSC...">
+              <input type="text" class="search-segment-input" id="search-input-book" placeholder="Search books, authors, SSC, MPPSC..." oninput="triggerSearch(false)" onkeydown="if(event.key==='Enter'){event.preventDefault();triggerSearch(true);}">
             </div>
             <div class="search-divider"></div>
             <div class="search-segment">
               <span class="search-segment-label">Category</span>
-              <select class="search-segment-select" id="search-input-cat">
+              <select class="search-segment-select" id="search-input-cat" onchange="triggerSearch(true)">
                 <option value="">All Categories</option>
                 <option value="SSC">SSC &amp; Competitive Exams</option>
                 <option value="Autobiography">Autobiography &amp; Memoirs</option>
@@ -194,7 +194,7 @@
               <span class="search-segment-label">Location</span>
               <span class="search-segment-val">Bhanwarkua, Indore</span>
             </div>
-            <button class="search-orb" aria-label="Search">
+            <button type="button" class="search-orb" aria-label="Search" onclick="triggerSearch(true)">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
           </div>
