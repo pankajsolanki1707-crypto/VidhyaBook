@@ -3919,38 +3919,74 @@ textarea:focus-visible {
 @media (max-width: 640px) {
   .books-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
   }
-  .book-card-body { padding: 10px 10px 12px; }
-  .book-card-title { font-size: 0.8rem; }
-  .book-card-desc { display: none; }
-  .btn-buy-now { font-size: 0.7rem; padding: 8px 8px; }
-  .btn-add-cart { font-size: 0.7rem; padding: 8px 8px; }
-  .catalogue-trust-bar { gap: 16px; padding: 16px; }
-  .ctb-item { font-size: 0.75rem; }
-}
-
-/* Mobile Modal */
-@media (max-width: 768px) {
-  .book-modal-grid { grid-template-columns: 1fr; }
-  .book-modal-img-side { border-right: none; border-bottom: 1px solid var(--border-light); padding: 20px; }
-  .book-modal-img-wrap { max-width: 180px; margin: 0 auto; }
-  .book-modal-info { padding: 20px; }
-  .modal-book-title { font-size: 1.25rem; }
-  .modal-actions { flex-direction: column; }
-  .checkout-step { padding: 24px 20px 28px; }
-  .form-row { grid-template-columns: 1fr; }
-  .delivery-options { flex-direction: column; }
-  .success-actions { flex-direction: column; align-items: center; }
-  .btn-download-screenshot, .btn-copy-booking, .btn-whatsapp-confirm { width: 100%; justify-content: center; }
-  .cart-panel { width: 100%; }
-  .checkout-title { font-size: 1.35rem; }
-}
-
-@media (max-width: 480px) {
-  .book-card-actions { gap: 5px; }
-  .book-card-badge { display: none; }
-  .book-card-pricing { flex-wrap: wrap; gap: 4px; }
+  .book-card {
+    border-radius: 12px;
+  }
+  .book-card-img-wrap {
+    height: 175px;
+    aspect-ratio: auto;
+  }
+  .book-card-img {
+    padding: 6px;
+    object-fit: contain;
+  }
+  .book-card-body {
+    padding: 8px 8px 10px;
+  }
+  .book-card-title {
+    font-size: 0.8rem;
+    line-height: 1.25;
+    margin-bottom: 4px;
+  }
+  .book-card-desc {
+    display: none;
+  }
+  .book-card-actions {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .btn-buy-now {
+    font-size: 0.72rem;
+    padding: 8px 4px;
+    flex: 1;
+    justify-content: center;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .btn-add-cart {
+    font-size: 0.72rem;
+    padding: 8px 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .btn-add-cart span {
+    display: none; /* Hide '+ Add' text on 2-col mobile layout to prevent button overflow */
+  }
+  .catalogue-trust-bar {
+    gap: 12px;
+    padding: 12px;
+  }
+  .ctb-item {
+    font-size: 0.72rem;
+  }
+  .mobile-fab-container {
+    bottom: 16px;
+    right: 14px;
+    gap: 8px;
+  }
+  .fab {
+    width: 44px;
+    height: 44px;
+  }
+  .back-to-top-btn {
+    bottom: 16px;
+    left: 14px;
+    width: 44px;
+    height: 44px;
+  }
 }
 
 /* Fix header action overlapping on intermediate screens */
