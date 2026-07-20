@@ -1515,8 +1515,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchOrb = document.querySelector('.search-orb');
 
   function filterBooks(scrollToBestsellers = false) {
-    const query = (searchInputBook ? searchInputBook.value : '').toLowerCase().trim();
-    const selectedCategory = (searchInputCat ? searchInputCat.value : '').toLowerCase().trim();
+    let rawQuery = (searchInputBook ? searchInputBook.value : '').toLowerCase().trim();
+    let selectedCat = (searchInputCat ? searchInputCat.value : '').toLowerCase().trim();
+    
+    // Normalize generic bookstore terms ("books", "book", "store", "bestsellers", "read", "all") -> match all
+    const genericTerms = ['books', 'book', 'bestseller', 'bestsellers', 'store', 'shop', 'read', 'all', 'vidhya'];
+    if (genericTerms.includes(rawQuery)) {
+      rawQuery = '';
+    }
+
+    // Stemming & Plurals: strip trailing 's' or 'es' if present (e.g. "philosophies" -> "philosophy", "exams" -> "exam")
+    let queryStem = rawQuery;
+    if (queryStem.endsWith('ies')) {
+      queryStem = queryStem.slice(0, -3) + 'y';
+    } else if (queryStem.endsWith('s') && !queryStem.endsWith('ss') && queryStem.length > 3) {
+      queryStem = queryStem.slice(0, -1);
+    }
+
+    // Category Synonym mapping
+    const categorySynonyms = {
+      'philosophy': ['philosophy', 'strategy', 'mind', 'psychology', 'self help', 'courage', 'art of war', 'detachment'],
+      'ssc': ['ssc', 'exam', 'fatman', 'parmar', 'gk', 'gs', 'theory', 'bestseller'],
+      'autobiography': ['autobiography', 'memoir', 'wings of fire', 'kalam', 'biography'],
+      'self help': ['self help', 'self-help', 'growth', 'mindfulness', 'wellness', 'overthinking', 'disliked'],
+      'psychology': ['psychology', 'mind', 'minds', 'reading minds', 'psych', 'wellness', 'overthinking']
+    };
+
     const cards = document.querySelectorAll('.book-card');
     let visibleCount = 0;
 
@@ -1526,10 +1550,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const desc = (card.querySelector('.book-card-desc')?.textContent || '').toLowerCase();
       const metaName = (card.querySelector('meta[itemprop="name"]')?.content || '').toLowerCase();
 
-      const matchesQuery = !query || title.includes(query) || category.includes(query) || desc.includes(query) || metaName.includes(query);
-      const matchesCat = !selectedCategory || category.includes(selectedCategory);
+      const fullCardText = `${title} ${category} ${desc} ${metaName}`.toLowerCase();
 
-      if (matchesQuery && matchesCat) {
+      // Query Matching
+      let matchesQuery = true;
+      if (rawQuery.length > 0) {
+        matchesQuery = fullCardText.includes(rawQuery) || fullCardText.includes(queryStem);
+      }
+
+      // Category Matching
+      let matchesCategory = true;
+      if (selectedCat.length > 0) {
+        const allowedKeywords = categorySynonyms[selectedCat] || [selectedCat];
+        matchesCategory = allowedKeywords.some(kw => fullCardText.includes(kw));
+      }
+
+      if (matchesQuery && matchesCategory) {
         card.style.display = '';
         visibleCount++;
       } else {
@@ -1551,7 +1587,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       emptyState.innerHTML = `
         <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
-        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 6px;">No books found matching "${query || selectedCategory}"</h3>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 6px;">No books found matching "${rawQuery || selectedCat}"</h3>
         <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 20px;">Try searching another keyword or clear your filters to view all available titles.</p>
         <button type="button" class="btn btn-primary" onclick="resetBookSearch()">Reset Search Filter</button>
       `;
