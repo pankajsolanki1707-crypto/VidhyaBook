@@ -357,12 +357,15 @@ ul {
 
 .logo-icon {
   width: 34px;
-  height: 34px;
-  color: var(--primary);
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-  box-shadow: none;
+.brand-logo-mark {
+  flex-shrink: 0;
+  display: block;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+}
+
+.logo-link:hover .brand-logo-mark {
+  transform: scale(1.06);
+  filter: drop-shadow(0 4px 12px rgba(255, 56, 92, 0.3));
 }
 
 .logo-text-main {
