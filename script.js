@@ -861,6 +861,22 @@ function waClearForm() {
   }
 }
 
+function generateBookingId() {
+  const year = new Date().getFullYear();
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `VB${year}${rand}`;
+}
+
+function saveOrder(orderData) {
+  try {
+    const orders = JSON.parse(localStorage.getItem('vbs_orders') || '[]');
+    orders.push(orderData);
+    localStorage.setItem('vbs_orders', JSON.stringify(orders));
+  } catch(e) {
+    console.warn('LocalStorage save error:', e);
+  }
+}
+
 window.waSubmitOrder = function() {
   document.querySelectorAll('.wa-form-group').forEach(fg => fg.classList.remove('has-error'));
   document.querySelectorAll('.wa-err-msg').forEach(em => { em.textContent = ''; em.classList.remove('active'); });
