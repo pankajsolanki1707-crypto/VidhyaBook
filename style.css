@@ -4349,6 +4349,15 @@ textarea:focus-visible {
   flex-wrap: wrap;
 }
 
+.wa-modal-footer {
+  padding: 16px 24px;
+  background: #ffffff;
+  border-top: 1px solid var(--border-light);
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
+  z-index: 5;
+  flex-shrink: 0;
+}
+
 /* WhatsApp Submit Button */
 .wa-submit-btn {
   width: 100%;
